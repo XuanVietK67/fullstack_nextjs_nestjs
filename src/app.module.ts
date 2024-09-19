@@ -12,6 +12,9 @@ import { OrderDetailsModule } from '@module/order.details/order-details.module';
 import { OrdersModule } from '@module/orders/orders.module';
 import { RestaurantsModule } from '@module/restaurants/restaurants.module';
 import { ReviewsModule } from '@module/reviews/reviews.module';
+import { AuthModule } from '@/auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, }),
@@ -30,9 +33,16 @@ import { ReviewsModule } from '@module/reviews/reviews.module';
         uri: configService.get<string>('MONGODB_URI'),
       }),
       inject: [ConfigService],
-    })
+    }),
+    AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule { }

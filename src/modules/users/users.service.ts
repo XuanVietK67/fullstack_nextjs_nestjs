@@ -3,24 +3,27 @@ import { CreateUserDto } from '@module/users/dto/create-user.dto';
 import { UpdateUserDto } from '@module/users/dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '@module/users/schemas/user.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { HashPassword } from '@/util/helper';
-
+import aqp from 'api-query-params';
+import dayjs from 'dayjs';
+import { v4 as uuidv4 } from 'uuid';
+import { CreateRegisterUserDto } from '@/auth/schemas/create-auth.dto';
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private usersModel: Model<User>) { }
   EmailExist = async (email: string) => {
-    const user = await this.usersModel.exists({email:email})
-    if (user){
+    const user = await this.usersModel.exists({ email: email })
+    if (user) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
   async create(createUserDto: CreateUserDto) {
     const { name, email, password, phone, address, image } = createUserDto
-    const isExist=await this.EmailExist(email)
-    if(isExist){
+    const isExist = await this.EmailExist(email)
+    if (isExist) {
       throw new BadRequestException("Email already exists")
     }
     //hash password
@@ -33,19 +36,67 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(query: string, current: number, pageSize: number) {
+    const { filter, sort } = aqp(query)
+    // clear filter
+    if (filter.current) delete filter.current
+    if (filter.pageSize) delete filter.pageSize
+    //validate current and pageSize
+    if (!current) current = 1;
+    if (!pageSize) pageSize = 10;
+
+
+    const totalItems = (await this.usersModel.find(filter)).length
+    const skipp = (current - 1) * pageSize
+    const totalPage = Math.ceil(totalItems / pageSize)
+
+
+    const result = await this.usersModel
+      .find(filter)
+      .limit(pageSize)
+      .skip(skipp)
+      .select("-password")
+      .sort(sort as any)
+    return { result, totalPage }
   }
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findUserByEmail(email: string) {
+    return await this.usersModel.findOne({ email })
+  }
+  async update(updateUserDto: UpdateUserDto) {
+    return await this.usersModel.updateOne(
+      { _id: updateUserDto._id }, { ...updateUserDto }
+    )
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(_id: string) {
+    if (mongoose.isValidObjectId(_id)) {
+      return await this.usersModel.deleteOne({ _id })
+    } else {
+      console.log("check id: ", _id)
+      throw new BadRequestException("In valid id")
+    }
+  }
+  // hash password, create user
+  async CreateRegisterUser(registerDto: CreateRegisterUserDto) {
+    const { email, username, password } = registerDto
+    const isExist = await this.EmailExist(email)
+    if (isExist) {
+      throw new BadRequestException("Email already exists")
+    }
+    const hashPassword = await HashPassword(password)
+    const user = await this.usersModel.create({
+      email, name: username, password: hashPassword,
+      code_id: uuidv4(),
+      code_expired: dayjs().add(1, 'day'),
+      is_active: false
+    })
+    // return response
+    return {
+      _id: user._id
+    }
   }
 }
