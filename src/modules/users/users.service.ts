@@ -9,9 +9,13 @@ import aqp from 'api-query-params';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateRegisterUserDto } from '@/auth/schemas/create-auth.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private usersModel: Model<User>) { }
+  constructor(
+    @InjectModel(User.name) private usersModel: Model<User>,
+    private readonly mailerService: MailerService,
+  ) { }
   EmailExist = async (email: string) => {
     const user = await this.usersModel.exists({ email: email })
     if (user) {
@@ -88,11 +92,23 @@ export class UsersService {
       throw new BadRequestException("Email already exists")
     }
     const hashPassword = await HashPassword(password)
+    const codeId=uuidv4()
     const user = await this.usersModel.create({
       email, name: username, password: hashPassword,
-      code_id: uuidv4(),
+      code_id: codeId,
       code_expired: dayjs().add(1, 'day'),
       is_active: false
+    })
+    //send email
+    this.mailerService.sendMail({
+      to: user.email, // list of receivers
+      subject: 'Active your account at XuanVietDev', // Subject line
+      text: 'welcome', // plaintext body
+      template: "register",
+      context: {
+        name: user.name,
+        activationCode: codeId
+      }
     })
     // return response
     return {

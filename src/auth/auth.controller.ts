@@ -29,13 +29,17 @@ export class AuthController {
     }
     @Get('mail')
     @Public()
-    TestMail() {
+    SendMail() {
         this.mailerService
             .sendMail({
-                to: 'phamxuanviet14920041@gmail.com', // list of receivers
+                to: 'xuanvietdev@gmail.com', // list of receivers
                 subject: 'Testing Nest MailerModule ✔', // Subject line
                 text: 'welcome', // plaintext body
-                html: '<b>hello world from xuanvietdev </b>', // HTML body content
+                template: "register",
+                context :{
+                    name: "xuanviet",
+                    activationCode: 123456 
+                }
             })
         return "sent email success"
     }
