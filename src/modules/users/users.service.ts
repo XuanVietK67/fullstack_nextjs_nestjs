@@ -8,7 +8,7 @@ import { HashPassword } from '@/util/helper';
 import aqp from 'api-query-params';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateRegisterUserDto } from '@/auth/schemas/create-auth.dto';
+import { CreateRegisterUserDto, CreateVerifyUserDto } from '@/auth/schemas/create-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 @Injectable()
 export class UsersService {
@@ -81,7 +81,7 @@ export class UsersService {
       return await this.usersModel.deleteOne({ _id })
     } else {
       console.log("check id: ", _id)
-      throw new BadRequestException("In valid id")
+      throw new BadRequestException("Invalid id")
     }
   }
   // hash password, create user
@@ -99,7 +99,7 @@ export class UsersService {
       code_expired: dayjs().add(1, 'day'),
       is_active: false
     })
-    //send email
+    // send email
     this.mailerService.sendMail({
       to: user.email, // list of receivers
       subject: 'Active your account at XuanVietDev', // Subject line
@@ -110,9 +110,44 @@ export class UsersService {
         activationCode: codeId
       }
     })
-    // return response
     return {
+      email: user.email,
       _id: user._id
+    }
+  }
+  async CreateVerifyUser(VerifyData: CreateVerifyUserDto){
+    const user=await this.usersModel.findOne({
+      _id:VerifyData.id,
+      code_id:VerifyData.code
+    })
+    if(user){
+      await this.usersModel.updateOne({_id:VerifyData.id},{is_active:true})
+      return{
+        message: "Active account successfully"
+      }
+    }
+    else{
+      throw new BadRequestException('Code is not correct or expired')
+    }
+  }
+  async ResendMail(ResendData: CreateVerifyUserDto){
+    const codeId=uuidv4()
+    const user= await this.usersModel.findOne({
+      _id: ResendData.id,
+      code_id: ResendData.code
+    })
+    this.mailerService.sendMail({
+      to: user.email, // list of receivers
+      subject: 'Active your account at XuanVietDev', // Subject line
+      text: 'welcome', // plaintext body
+      template: "register",
+      context: {
+        name: user.name,
+        activationCode: codeId
+      }
+    })
+    return{
+      message:'Resend Email success'
     }
   }
 }

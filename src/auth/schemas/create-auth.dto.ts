@@ -11,3 +11,11 @@ export class CreateRegisterUserDto {
     @IsNotEmpty()
     username: string;
 }
+
+export class CreateVerifyUserDto{
+    @IsNotEmpty()
+    id: string;
+
+    @IsNotEmpty()
+    code: string
+}
