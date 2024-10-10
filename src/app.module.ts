@@ -4,14 +4,6 @@ import { AppService } from '@/app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from '@module/users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { LikesModule } from '@module/likes/likes.module';
-import { MenuModule } from '@module/menu/menu.module';
-import { MenuItemOptionsModule } from '@module/menu.item.options/menu-item-options.module';
-import { MenuItemsModule } from '@module/menu.items/menu-items.module';
-import { OrderDetailsModule } from '@module/order.details/order-details.module';
-import { OrdersModule } from '@module/orders/orders.module';
-import { RestaurantsModule } from '@module/restaurants/restaurants.module';
-import { ReviewsModule } from '@module/reviews/reviews.module';
 import { AuthModule } from '@/auth/auth.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
@@ -20,20 +12,14 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { TransformInterceptor } from './core/transform.interceptor';
 import { QuizzsModule } from '@module/quizzs/quizzs.module';
+import { QuestionModule } from '@module/question/question.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, }),
     UsersModule,
-    LikesModule,
-    MenuModule,
-    MenuItemOptionsModule,
-    MenuItemsModule,
-    OrderDetailsModule,
-    OrdersModule,
-    RestaurantsModule,
-    ReviewsModule,
     AuthModule,
     QuizzsModule,
+    QuestionModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -71,7 +57,6 @@ import { QuizzsModule } from '@module/quizzs/quizzs.module';
       inject: [ConfigService],
 
     }),
-    QuizzsModule,
   ],
   controllers: [AppController],
   providers: [
