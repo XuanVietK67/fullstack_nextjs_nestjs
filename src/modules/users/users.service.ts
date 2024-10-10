@@ -8,7 +8,7 @@ import { HashPassword } from '@/util/helper';
 import aqp from 'api-query-params';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateRegisterUserDto, CreateVerifyUserDto } from '@/auth/schemas/create-auth.dto';
+import { changePassword, CreateRegisterUserDto, createResendMailDto, CreateVerifyUserDto } from '@/auth/schemas/create-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 @Injectable()
 export class UsersService {
@@ -45,15 +45,14 @@ export class UsersService {
     // clear filter
     if (filter.current) delete filter.current
     if (filter.pageSize) delete filter.pageSize
-    //validate current and pageSize
+    //validate current and pageSize 
     if (!current) current = 1;
-    if (!pageSize) pageSize = 10;
+    if (!pageSize) pageSize = 10; 
 
 
     const totalItems = (await this.usersModel.find(filter)).length
     const skipp = (current - 1) * pageSize
     const totalPage = Math.ceil(totalItems / pageSize)
-
 
     const result = await this.usersModel
       .find(filter)
@@ -61,7 +60,15 @@ export class UsersService {
       .skip(skipp)
       .select("-password")
       .sort(sort as any)
-    return { result, totalPage }
+    return { 
+      pageInfo: {
+        totalPage,
+        totalItems,
+        currentPage:current ,
+        pageSize
+      },
+      result
+    }
   }
 
   findOne(id: number) {
@@ -80,7 +87,6 @@ export class UsersService {
     if (mongoose.isValidObjectId(_id)) {
       return await this.usersModel.deleteOne({ _id })
     } else {
-      console.log("check id: ", _id)
       throw new BadRequestException("Invalid id")
     }
   }
@@ -100,16 +106,16 @@ export class UsersService {
       is_active: false
     })
     // send email
-    this.mailerService.sendMail({
-      to: user.email, // list of receivers
-      subject: 'Active your account at XuanVietDev', // Subject line
-      text: 'welcome', // plaintext body
-      template: "register",
-      context: {
-        name: user.name,
-        activationCode: codeId
-      }
-    })
+    // this.mailerService.sendMail({
+    //   to: user.email, // list of receivers
+    //   subject: 'Active your account at XuanVietDev', // Subject line
+    //   text: 'welcome', // plaintext body
+    //   template: "register",
+    //   context: {
+    //     name: user.name,
+    //     activationCode: codeId
+    //   }
+    // })
     return {
       email: user.email,
       _id: user._id
@@ -117,11 +123,11 @@ export class UsersService {
   }
   async CreateVerifyUser(VerifyData: CreateVerifyUserDto){
     const user=await this.usersModel.findOne({
-      _id:VerifyData.id,
-      code_id:VerifyData.code
+      email: VerifyData.email,
+      code_id: VerifyData.code
     })
     if(user){
-      await this.usersModel.updateOne({_id:VerifyData.id},{is_active:true})
+      await this.usersModel.updateOne({email: VerifyData.email},{is_active:true})
       return{
         message: "Active account successfully"
       }
@@ -130,12 +136,15 @@ export class UsersService {
       throw new BadRequestException('Code is not correct or expired')
     }
   }
-  async ResendMail(ResendData: CreateVerifyUserDto){
-    const codeId=uuidv4()
-    const user= await this.usersModel.findOne({
-      _id: ResendData.id,
-      code_id: ResendData.code
+  async ResendMail(ResendData: createResendMailDto){
+    const user=await this.usersModel.findOne({
+      email: ResendData.username
     })
+    if(!user){
+      throw new BadRequestException("Email is not exists")
+    }
+    const codeId=uuidv4()
+    await this.usersModel.updateOne({email:ResendData.username},{code_id:codeId})
     this.mailerService.sendMail({
       to: user.email, // list of receivers
       subject: 'Active your account at XuanVietDev', // Subject line
@@ -147,7 +156,14 @@ export class UsersService {
       }
     })
     return{
-      message:'Resend Email success'
+      message:'Send Email success'
+    }
+  }
+  async changePassword(passwordData: changePassword){
+    const newPassword= await HashPassword(passwordData.password)
+    await this.usersModel.updateOne({email: passwordData.email},{password:newPassword})
+    return{
+      message:'Change password successfully'
     }
   }
 }

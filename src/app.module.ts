@@ -19,6 +19,7 @@ import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { TransformInterceptor } from './core/transform.interceptor';
+import { QuizzsModule } from '@module/quizzs/quizzs.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, }),
@@ -32,6 +33,7 @@ import { TransformInterceptor } from './core/transform.interceptor';
     RestaurantsModule,
     ReviewsModule,
     AuthModule,
+    QuizzsModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -59,7 +61,7 @@ import { TransformInterceptor } from './core/transform.interceptor';
         },
         // preview: true,
         template: {
-          dir: process.cwd()+'/src/mail/templates',
+          dir: process.cwd() + '/src/mail/templates',
           adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
           options: {
             strict: true,
@@ -69,6 +71,7 @@ import { TransformInterceptor } from './core/transform.interceptor';
       inject: [ConfigService],
 
     }),
+    QuizzsModule,
   ],
   controllers: [AppController],
   providers: [

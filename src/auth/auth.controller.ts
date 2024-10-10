@@ -3,7 +3,7 @@ import { AuthService } from '@/auth/auth.service';
 import { JwtAuthGuard } from '@/auth/passport/jwt-auth.guard';
 import { LocalAuthGuard } from '@/auth/passport/local-auth.guard';
 import { Public, ResponseMessage } from '@/auth/decoration/customizePublicAccessToken';
-import { CreateRegisterUserDto, CreateVerifyUserDto } from '@/auth/schemas/create-auth.dto';
+import { changePassword, CreateRegisterUserDto, createResendMailDto, CreateVerifyUserDto } from '@/auth/schemas/create-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 @Controller('auth')
 export class AuthController {
@@ -33,25 +33,14 @@ export class AuthController {
     postVerify(@Body() verifyDto: CreateVerifyUserDto){
         return this.authService.verify(verifyDto)
     }
-    // @Get('mail')
-    // @Public()
-    // SendMail() {
-    //     this.mailerService
-    //         .sendMail({
-    //             to: 'xuanvietdev@gmail.com', // list of receivers
-    //             subject: 'Testing Nest MailerModule ✔', // Subject line
-    //             text: 'welcome', // plaintext body
-    //             template: "register",
-    //             context: {
-    //                 name: "xuanviet",
-    //                 activationCode: 123456
-    //             }
-    //         })
-    //     return "sent email success"
-    // }
     @Post('mail')
     @Public()
-    postResendMail(@Body() Resend: CreateVerifyUserDto){
+    postResendMail(@Body() Resend: createResendMailDto){
         return this.authService.resend(Resend)
+    }
+    @Post('forgot')
+    @Public()
+    postChangePassword(@Body() ChangePasswordDto: changePassword){
+        return this.authService.changePassword(ChangePasswordDto)
     }
 }

@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '@/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { comparePassword } from '@/util/helper';
-import { CreateRegisterUserDto, CreateVerifyUserDto } from '@/auth/schemas/create-auth.dto';
+import { changePassword, CreateRegisterUserDto, createResendMailDto, CreateVerifyUserDto } from '@/auth/schemas/create-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +36,10 @@ export class AuthService {
     async verify(verifyData: CreateVerifyUserDto){
         return this.usersService.CreateVerifyUser(verifyData)
     }
-    async resend(ResendData: CreateVerifyUserDto){
+    async resend(ResendData: createResendMailDto){
         return this.usersService.ResendMail(ResendData)
+    }
+    async changePassword(passwordData: changePassword){
+        return this.usersService.changePassword(passwordData)
     }
 }
