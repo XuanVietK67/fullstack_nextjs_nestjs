@@ -1,4 +1,3 @@
-// export class Quizz {}
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
@@ -14,7 +13,10 @@ export class Quizz {
   id: string
 
   @Prop()
-  image: string;
+  image: string
+
+  @Prop()
+  level: string
 }
 
 export const QuizzSchema = SchemaFactory.createForClass(Quizz);

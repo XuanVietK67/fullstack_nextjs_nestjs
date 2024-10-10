@@ -9,4 +9,6 @@ import { Questions, QuestionsSchema } from '@module/question/schemas/question.sc
   controllers: [QuestionController],
   providers: [QuestionService],
 })
-export class QuestionModule {}
+export class QuestionModule {
+  constructor(private questionService: QuestionService) {}
+}
