@@ -1,6 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateQuizzDto } from './create-quizz.dto';
 import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Questions } from '@/modules/question/schemas/question.schema';
 
 
 export class DataGetQuestionsDto{
@@ -9,7 +10,7 @@ export class DataGetQuestionsDto{
 }
 export class UpdateQuizzDto{
     @IsNotEmpty()
-    id: string
+    _id: string
     @IsOptional()
     name: string
     @IsOptional()
@@ -18,4 +19,6 @@ export class UpdateQuizzDto{
     level: string
     @IsOptional()
     image: string
+    @IsOptional()
+    questions: Questions[]
 }

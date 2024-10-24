@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { QuizzsService } from './quizzs.service';
 import { CreateQuizzDto } from './dto/create-quizz.dto';
 import { DataGetQuestionsDto, UpdateQuizzDto } from './dto/update-quizz.dto';
@@ -11,34 +11,27 @@ export class QuizzsController {
   create(@Body() createQuizzDto: CreateQuizzDto) {
     return this.quizzsService.create(createQuizzDto);
   }
-
-  @Get('getQuestion')
-  getQuestion(@Body() DataGetQuestion: DataGetQuestionsDto) {
-    return this.quizzsService.getQuestionByQuizzId(DataGetQuestion);
-  }
   @Patch('update')
   updateQuizz(@Body() DataUpdateQuizz: UpdateQuizzDto){
     return this.quizzsService.update(DataUpdateQuizz)
   }
-
-  @Delete('remove')
-  remove(@Body() DataDeleteQuizz: UpdateQuizzDto) {
-    return this.quizzsService.remove(DataDeleteQuizz);
-  }
+  // @Delete('remove')
+  // remove(@Body() DataDeleteQuizz: UpdateQuizzDto) {
+  //   return this.quizzsService.remove(DataDeleteQuizz);
+  // }
   @Get()
-  findAll() {
-    return this.quizzsService.findAll();
+  findAll(
+    @Query('current') current:string,
+    @Query('pageSize') pageSize:string,
+  ) {
+    return this.quizzsService.findAll(current,pageSize);
   }
-
+  @Get('all')
+  findAllQuizz() {
+    return this.quizzsService.findAllQuizz();
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.quizzsService.findOne(+id);
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateQuizzDto: UpdateQuizzDto) {
-  //   return this.quizzsService.update(+id, updateQuizzDto);
-  // }
-
-  
 }

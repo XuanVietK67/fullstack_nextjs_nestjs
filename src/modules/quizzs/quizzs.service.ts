@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Quizz } from '@module/quizzs/schemas/quizz.schema';
 import { Questions } from '../question/schemas/question.schema';
+// import aqp from 'api-query-params';
 
 @Injectable()
 export class QuizzsService {
@@ -14,48 +15,50 @@ export class QuizzsService {
   ) { }
   async create(createQuizzDto: CreateQuizzDto) {
     const { name, description, level, image } = createQuizzDto
-    const count = await this.QuizzModel.find()
+    const questions = [{description:"", answers: [{description:'',correctAnswer:false}]}]
     const res = await this.QuizzModel.create({
-      name, description, level, image, id: +count + 1
+      name, description, level, image, questions: questions
     })
     return res
   }
-  async getQuestionByQuizzId(DataGetQuestion: DataGetQuestionsDto) {
-    const { quizzId } = DataGetQuestion
-    const questions = await this.QuestionModel.find({
-      quizzId
-    })
-    const res = await this.QuizzModel.updateOne(
-      { id: quizzId }, { questions }
-    )
-    const quizz = await this.QuizzModel.findOne({
-      id: quizzId
-    })
-    return {
-      res, quizz
-    }
-  }
   async update(DataUpdate: UpdateQuizzDto) {
-    const { id, name, description, level, image } = DataUpdate
-    const res = await this.QuizzModel.updateOne(
-      { id }, { name, description, level, image }
+    const {name, description,level,image,_id,questions}=DataUpdate
+    const res=await this.QuizzModel.updateOne(
+      {_id},{name,description,image,level,questions}
     )
-    const quizz = await this.QuizzModel.findOne({
-      id
-    })
+    return res
+  }
+  // async remove(DataDeleteQuizz: UpdateQuizzDto) {
+  //   const { id } = DataDeleteQuizz
+  //   await this.QuizzModel.deleteOne({
+  //     id
+  //   })
+  // }
+
+  async findAll( current: string, pageSize: string) {
+    const skipp=(+current-1)*(+pageSize)
+    const res=await this.QuizzModel
+    .find()
+    .limit(+pageSize)
+    .skip(skipp)
+    const quizzs=await this.QuizzModel.find()
+    const totalItems=quizzs.length
+    const info={
+      totalItems,current,pageSize
+    }
     return {
-      res, quizz
+      res, info
     }
   }
-  async remove(DataDeleteQuizz: UpdateQuizzDto) {
-    const {id}=DataDeleteQuizz
-    await this.QuizzModel.deleteOne({
-      id
-    })
+
+  async findAllQuizz(){
+    const res= await this.QuizzModel.find()
+    const numberOfQuizz=res.length
+    return {
+      res,numberOfQuizz
+    }
   }
-  findAll() {
-    return `This action returns all quizzs`;
-  }
+
 
   findOne(id: number) {
     return `This action returns a #${id} quizz`;

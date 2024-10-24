@@ -14,9 +14,6 @@ export class Quizz {
   description: string;
 
   @Prop()
-  id: string
-
-  @Prop()
   image: string
 
   @Prop()

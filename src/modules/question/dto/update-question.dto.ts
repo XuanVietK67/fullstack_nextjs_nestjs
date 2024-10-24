@@ -8,6 +8,8 @@ export class UpdateQuestionDto {
     quizzId: string
     @IsOptional()
     description: string
+    @IsOptional()
+    image:string
 }
 
 export class DeleteQuestionDto{
