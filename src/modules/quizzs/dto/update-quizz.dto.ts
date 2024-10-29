@@ -19,6 +19,20 @@ export class UpdateQuizzDto{
     level: string
     @IsOptional()
     image: string
+}
+
+export class UpdateQuestion{
+    @IsNotEmpty()
+    _id : string
+    @IsNotEmpty()
+    index: number
     @IsOptional()
-    questions: Questions[]
+    question: Questions
+}
+
+export class Score{
+    @IsNotEmpty()
+    result: string[]
+    @IsNotEmpty()
+    _id: string
 }

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { QuizzsService } from './quizzs.service';
-import { CreateQuizzDto } from './dto/create-quizz.dto';
-import { DataGetQuestionsDto, UpdateQuizzDto } from './dto/update-quizz.dto';
+import { CreateQuizzDto } from '@/modules/quizzs/dto/create-quizz.dto';
+import {   Score, UpdateQuestion, UpdateQuizzDto } from '@/modules/quizzs/dto/update-quizz.dto';
 
 @Controller('quizzs')
 export class QuizzsController {
@@ -15,10 +15,11 @@ export class QuizzsController {
   updateQuizz(@Body() DataUpdateQuizz: UpdateQuizzDto){
     return this.quizzsService.update(DataUpdateQuizz)
   }
-  // @Delete('remove')
-  // remove(@Body() DataDeleteQuizz: UpdateQuizzDto) {
-  //   return this.quizzsService.remove(DataDeleteQuizz);
-  // }
+
+  @Patch('update/question')
+  updateQuestion(@Body() DataUpdateQuestion: UpdateQuestion){
+    return this.quizzsService.updateQuestion(DataUpdateQuestion)
+  }
   @Get()
   findAll(
     @Query('current') current:string,
@@ -30,8 +31,16 @@ export class QuizzsController {
   findAllQuizz() {
     return this.quizzsService.findAllQuizz();
   }
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.quizzsService.findOne(+id);
+  @Get('getOne')
+  findOne(@Query('_id') _id:string,) {
+    return this.quizzsService.findOne(_id);
+  }
+  @Get('getOne/noCorrectAnswer')
+  findQuiz(@Query('_id') _id:string,) {
+    return this.quizzsService.findQuizNoAnswer(_id);
+  }
+  @Post('score')
+  score(@Body() answers: Score){
+    return this.quizzsService.score(answers)
   }
 }
