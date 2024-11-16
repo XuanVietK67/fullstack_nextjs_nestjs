@@ -13,10 +13,12 @@ import { join } from 'path';
 import { TransformInterceptor } from './core/transform.interceptor';
 import { QuizzsModule } from '@module/quizzs/quizzs.module';
 import { QuestionModule } from '@module/question/question.module';
+import { StudentsModule } from './modules/students/students.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, }),
     UsersModule,
+    StudentsModule,
     AuthModule,
     QuizzsModule,
     QuestionModule,
