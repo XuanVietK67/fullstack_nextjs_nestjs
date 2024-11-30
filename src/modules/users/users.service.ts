@@ -10,10 +10,12 @@ import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { changePassword, CreateRegisterUserDto, createResendMailDto, CreateVerifyUserDto } from '@/auth/schemas/create-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
+import { Admin } from '@module/admin/schemas/admin.schema';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private usersModel: Model<User>,
+    @InjectModel(Admin.name) private adminsModel: Model<Admin>,
     private readonly mailerService: MailerService,
   ) { }
   EmailExist = async (email: string) => {
@@ -99,23 +101,16 @@ export class UsersService {
     }
     const hashPassword = await HashPassword(password)
     const codeId=uuidv4()
+
+    await this.adminsModel.create({
+      email,name: username, password: hashPassword, code_id: codeId, code_expired: dayjs().add(1,'day')
+    })
     const user = await this.usersModel.create({
-      email, name: username, password: hashPassword,
+      email, name: username, password: hashPassword,role:'admin',
       code_id: codeId,
       code_expired: dayjs().add(1, 'day'),
       is_active: false
     })
-    // send email
-    // this.mailerService.sendMail({
-    //   to: user.email, // list of receivers
-    //   subject: 'Active your account at XuanVietDev', // Subject line
-    //   text: 'welcome', // plaintext body
-    //   template: "register",
-    //   context: {
-    //     name: user.name,
-    //     activationCode: codeId
-    //   }
-    // })
     return {
       email: user.email,
       _id: user._id
@@ -128,6 +123,7 @@ export class UsersService {
     })
     if(user){
       await this.usersModel.updateOne({email: VerifyData.email},{is_active:true})
+      await this.adminsModel.updateOne({email: VerifyData.email},{is_active: true})
       return{
         message: "Active account successfully"
       }

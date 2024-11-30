@@ -6,19 +6,23 @@ import { UsersModule } from '@module/users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '@/auth/auth.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
+import { JwtAuthGuard } from '@/auth/passport/jwt-auth.guard';
 import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { TransformInterceptor } from './core/transform.interceptor';
 import { QuizzsModule } from '@module/quizzs/quizzs.module';
 import { QuestionModule } from '@module/question/question.module';
-import { StudentsModule } from './modules/students/students.module';
+import { StudentsModule } from '@module/students/students.module';
+import { TeacherModule } from '@module/teacher/teacher.module';
+import { AdminModule } from '@module/admin/admin.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, }),
     UsersModule,
     StudentsModule,
+    TeacherModule,
+    AdminModule,
     AuthModule,
     QuizzsModule,
     QuestionModule,

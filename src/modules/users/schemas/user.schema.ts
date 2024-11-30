@@ -35,15 +35,6 @@ export class User {
   @Prop({default: false})
   is_active: boolean;
 
-  @Prop({default: false})
-  is_teacher: boolean
-
-  @Prop({default: false})
-  is_admin: boolean
-
-  @Prop({default: false})
-  is_student: boolean
-
   @Prop()
   code_id: string;
   

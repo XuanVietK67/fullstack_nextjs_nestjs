@@ -12,27 +12,27 @@ export class StudentsService {
   constructor(
     @InjectModel(Student.name) private StudentModel: Model<Student>,
     @InjectModel(User.name) private UserModel: Model<User>
-  ) {}
+  ) { }
 
   async create(createStudentDto: CreateStudentDto) {
-    const {email,password,name,image,phone, address}=createStudentDto
-    const student= await this.StudentModel.findOne({
+    const { email, password, name, image, phone, address } = createStudentDto
+    const student = await this.StudentModel.findOne({
       email
     })
-    if(student){
+    if (student) {
       throw new BadRequestException(`${email} already exists`)
     }
     const hashPassword = await HashPassword(password)
     await this.UserModel.create({
-      email, password: hashPassword,name, phone, address, image, is_active: true, is_student: true
+      email, password: hashPassword, name, phone, address, image, is_active: true, is_student: true, role: "student"
     })
-    const res= await this.StudentModel.create({
-      email,password: hashPassword,name,image
+    const res = await this.StudentModel.create({
+      email, password: hashPassword, name, image, phone, address
     })
     return res
   }
 
-  async findStudentByEmail(email: string){
+  async findStudentByEmail(email: string) {
     return await this.StudentModel.findOne({
       email
     })
