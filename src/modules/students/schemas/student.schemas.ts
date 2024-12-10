@@ -6,6 +6,21 @@ import { HydratedDocument } from 'mongoose';
 
 export type StudentDocument = HydratedDocument<Student>;
 
+export type QuizAssign={
+  _id: string
+  image: string
+  name: string
+  description: string
+}
+
+export type QuizDone={
+  _id: string
+  image: string
+  name: string
+  description: string
+  scrore: number
+}
+
 @Schema()
 export class Student {
   @Prop()
@@ -35,8 +50,8 @@ export class Student {
   @Prop([Quizz])
   testsDone: Quizz[]
 
-  @Prop([Quizz])
-  testsAssigned: Quizz[]
+  @Prop([])
+  testsAssigned: QuizDone[]
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);

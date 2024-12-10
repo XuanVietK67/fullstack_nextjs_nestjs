@@ -23,7 +23,7 @@ export class Admin {
   @Prop({default: "Admin"})
   role: string
 
-  @Prop({default: false})
+  @Prop({default: true})
   is_active: boolean
 
   @Prop([Student])

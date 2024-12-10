@@ -6,6 +6,8 @@ export class CreateQuizzDto {
     @IsNotEmpty()
     description:string
     @IsNotEmpty()
+    teacherId: string
+    @IsNotEmpty()
     level: string
     @IsOptional()
     image: string

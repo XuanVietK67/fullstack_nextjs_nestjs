@@ -15,10 +15,10 @@ export class QuizzsService {
     @InjectModel(Questions.name) private QuestionModel: Model<Questions>,
   ) { }
   async create(createQuizzDto: CreateQuizzDto) {
-    const { name, description, level, image } = createQuizzDto
+    const { name, description, level, image, teacherId } = createQuizzDto
     const questions = [{ description: "", answers: [{ description: '', correctAnswer: false }] }]
     const res = await this.QuizzModel.create({
-      name, description, level, image, questions: questions
+      name, description, level, image, questions: questions, teacherId
     })
     return res
   }
@@ -116,5 +116,12 @@ export class QuizzsService {
       }
     })
     return point
+  }
+
+  async getQuiz(teacherId: string){
+    const quizs=await this.QuizzModel.find({
+      teacherId
+    })
+    return quizs
   }
 }

@@ -32,7 +32,7 @@ export class User {
   @Prop({default: "USER"})
   role: string;
 
-  @Prop({default: false})
+  @Prop({default: true})
   is_active: boolean;
 
   @Prop()

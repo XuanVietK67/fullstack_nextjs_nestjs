@@ -19,6 +19,9 @@ export class Quizz {
   @Prop()
   level: string
 
+  @Prop()
+  teacherId: string
+
   @Prop([Questions])
   questions: Questions[]
 }

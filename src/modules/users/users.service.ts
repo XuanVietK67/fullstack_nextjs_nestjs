@@ -94,7 +94,7 @@ export class UsersService {
   }
   // hash password, create user
   async CreateRegisterUser(registerDto: CreateRegisterUserDto) {
-    const { email, username, password } = registerDto
+    const { email, username, password, image } = registerDto
     const isExist = await this.EmailExist(email)
     if (isExist) {
       throw new BadRequestException("Email already exists")
@@ -103,13 +103,13 @@ export class UsersService {
     const codeId=uuidv4()
 
     await this.adminsModel.create({
-      email,name: username, password: hashPassword, code_id: codeId, code_expired: dayjs().add(1,'day')
+      email,name: username, password: hashPassword, code_id: codeId, code_expired: dayjs().add(1,'day'), image
     })
     const user = await this.usersModel.create({
-      email, name: username, password: hashPassword,role:'admin',
+      email, name: username, password: hashPassword,role:'admin',image,
       code_id: codeId,
       code_expired: dayjs().add(1, 'day'),
-      is_active: false
+      is_active: true
     })
     return {
       email: user.email,

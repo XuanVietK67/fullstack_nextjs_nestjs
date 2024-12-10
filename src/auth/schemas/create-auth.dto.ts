@@ -10,6 +10,9 @@ export class CreateRegisterUserDto {
 
     @IsNotEmpty()
     username: string;
+
+    @IsOptional()
+    image: string
 }
 
 export class CreateVerifyUserDto {

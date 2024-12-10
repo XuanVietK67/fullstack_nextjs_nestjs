@@ -13,4 +13,7 @@ export class CreateStudentDto {
     phone: string
     @IsOptional()
     address: string
+    // @IsNotEmpty()
+    // role: string
 }
+

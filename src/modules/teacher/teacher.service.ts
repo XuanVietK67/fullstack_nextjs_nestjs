@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
-import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Teacher } from './schemas/teacher.schema';
 import { Model } from 'mongoose';
 import { User } from '../users/schemas/user.schema';
 import { HashPassword } from '@/util/helper';
+import aqp from 'api-query-params';
+import { UpdateTeacher } from './dto/update-teacher.dto';
 
 @Injectable()
 export class TeacherService {
@@ -33,16 +34,58 @@ export class TeacherService {
     return res
   }
 
+
+  async findSomeTeacher(query: string, current: number, pageSize: number) {
+    const { filter, sort } = aqp(query)
+    // clear filter
+    if (filter.current) delete filter.current
+    if (filter.pageSize) delete filter.pageSize
+    //validate current and pageSize 
+    if (!current) current = 1;
+    if (!pageSize) pageSize = 10; 
+
+
+    const totalItems = (await this.TeacherModel.find(filter)).length
+    const skipp = (current - 1) * pageSize
+    const totalPage = Math.ceil(totalItems / pageSize)
+
+    const result = await this.TeacherModel
+      .find(filter)
+      .limit(pageSize)
+      .skip(skipp)
+      .select("-password")
+      .sort(sort as any)
+    return { 
+      pageInfo: {
+        totalPage,
+        totalItems,
+        currentPage:current ,
+        pageSize
+      },
+      result
+    }
+  }
+
   findAll() {
     return `This action returns all teacher`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} teacher`;
+  async findOne(_id: string) {
+    const teacher=await this.TeacherModel.findOne({
+      _id
+    })
+    return teacher
   }
 
-  update(id: number, updateTeacherDto: UpdateTeacherDto) {
-    return `This action updates a #${id} teacher`;
+  async update(_id: string, updateTeacherDto: UpdateTeacher) {
+    const {name, image}=updateTeacherDto
+    await this.TeacherModel.updateOne(
+      {_id}, {name, image}
+    )
+    const newTeacher=await this.TeacherModel.findOne({_id})
+
+    await this.UserModel.updateOne({email: newTeacher.email},{name, image})
+    return newTeacher
   }
 
   remove(id: number) {
