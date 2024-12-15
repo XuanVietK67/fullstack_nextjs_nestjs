@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
-import { AssignQuiz, DataUpdateStudent} from './dto/update-student.dto';
+import { AssignQuiz, DataUpdateStudent } from './dto/update-student.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Student } from './schemas/student.schemas';
@@ -55,7 +55,7 @@ export class StudentsService {
     if (filter.pageSize) delete filter.pageSize
     //validate current and pageSize 
     if (!current) current = 1;
-    if (!pageSize) pageSize = 10; 
+    if (!pageSize) pageSize = 10;
 
 
     const totalItems = (await this.StudentModel.find(filter)).length
@@ -68,12 +68,14 @@ export class StudentsService {
       .skip(skipp)
       .select("-password")
       .sort(sort as any)
-    return { 
+    return {
       pageInfo: {
         totalPage,
         totalItems,
-        currentPage:current ,
-        pageSize
+        currentPage: current,
+        pageSize,
+        from: (current - 1) * pageSize + 1,
+        to: totalItems - (current - 1) * pageSize > pageSize ? current * pageSize : totalItems
       },
       result
     }
@@ -81,18 +83,18 @@ export class StudentsService {
 
 
   async findOne(_id: string) {
-    const student=await this.StudentModel.findOne({_id})
+    const student = await this.StudentModel.findOne({ _id })
     return student
   }
 
   async update(_id: string, updateStudentDto: DataUpdateStudent) {
-    const {name, image}=updateStudentDto
+    const { name, image } = updateStudentDto
     await this.StudentModel.updateOne(
-      {_id}, {name, image}
+      { _id }, { name, image }
     )
 
-    const newStudent=await this.StudentModel.findOne({_id})
-    await this.UserModel.updateOne({email: newStudent.email},{name, image})
+    const newStudent = await this.StudentModel.findOne({ _id })
+    await this.UserModel.updateOne({ email: newStudent.email }, { name, image })
     return newStudent
   }
 
