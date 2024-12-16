@@ -72,6 +72,23 @@ export class TeacherService {
     return `This action returns all teacher`;
   }
 
+  async findAllQuiz(_id: string, current: number, pageSize: number) {
+    const user = await this.UserModel.findOne({ _id })
+    const teacher = await this.TeacherModel.findOne({ email: user.email })
+    const result = teacher.testList.slice((current - 1) * pageSize, current * pageSize)
+    const pageInfo = {
+      totalItems: result.length,
+      totalPage: Math.ceil(result.length / pageSize),
+      current,
+      pageSize,
+      from: (current - 1) * pageSize + 1,
+      to: result.length - (current - 1) * pageSize > pageSize ? current * pageSize : result.length
+    }
+    return {
+      result, pageInfo
+    }
+  }
+
   async findOne(_id: string) {
     const teacher = await this.TeacherModel.findOne({
       _id

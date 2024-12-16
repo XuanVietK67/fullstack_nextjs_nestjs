@@ -6,6 +6,8 @@ import { Model } from 'mongoose';
 import { Quizz } from '@module/quizzs/schemas/quizz.schema';
 import { Questions } from '../question/schemas/question.schema';
 import { UpdateQuestionDto } from '../question/dto/update-question.dto';
+import { Teacher } from '../teacher/schemas/teacher.schema';
+import { User } from '../users/schemas/user.schema';
 // import aqp from 'api-query-params';
 
 @Injectable()
@@ -13,6 +15,8 @@ export class QuizzsService {
   constructor(
     @InjectModel(Quizz.name) private QuizzModel: Model<Quizz>,
     @InjectModel(Questions.name) private QuestionModel: Model<Questions>,
+    @InjectModel(Teacher.name) private TeacherModel: Model<Teacher>,
+    @InjectModel(User.name) private UserModel: Model<User>,
   ) { }
   async create(createQuizzDto: CreateQuizzDto) {
     const { name, description, level, image, teacherId } = createQuizzDto
@@ -20,6 +24,11 @@ export class QuizzsService {
     const res = await this.QuizzModel.create({
       name, description, level, image, questions: questions, teacherId
     })
+    const user=await this.UserModel.findOne({ _id: teacherId})
+    const teacher=await this.TeacherModel.findOne({email: user.email})
+    await this.TeacherModel.updateOne(
+      {email: teacher.email}, {testList: [...teacher.testList, res]}
+    )
     return res
   }
   async update(DataUpdate: UpdateQuizzDto) {

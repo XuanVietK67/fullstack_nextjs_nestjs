@@ -17,6 +17,15 @@ export class TeacherController {
     return this.teacherService.findAll();
   }
 
+  @Get('getAllQuiz')
+  FindAllQuiz(
+    @Query('_id') _id: string,
+    @Query('current') current: string,
+    @Query('pageSize') pageSize: string,
+  ) {
+    return this.teacherService.findAllQuiz(_id, +current, +pageSize);
+  }
+
   @Get('getSome')
   async findSome(
     @Query() query: string,
