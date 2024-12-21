@@ -16,7 +16,7 @@ import { Quizz, QuizzSchema } from '../quizzs/schemas/quizz.schema';
   providers: [StudentsService],
   exports: [StudentsService]
 })
-export class StudentsModule {}
+export class StudentsModule { }
 
 
 

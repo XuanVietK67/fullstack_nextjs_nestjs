@@ -17,6 +17,14 @@ export class StudentsController {
     return this.studentsService.findAll();
   }
 
+  @Get('receive')
+  receive(
+    @Query('sId') studentId: string,
+    @Query('qId') quizId: string
+  ) {
+    return this.studentsService.receive(studentId, quizId);
+  }
+
   @Get('getSome')
   async findSome(
     @Query() query: string,

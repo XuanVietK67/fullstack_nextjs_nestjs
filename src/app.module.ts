@@ -12,7 +12,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { TransformInterceptor } from './core/transform.interceptor';
 import { QuizzsModule } from '@module/quizzs/quizzs.module';
-import { QuestionModule } from '@module/question/question.module';
 import { StudentsModule } from '@module/students/students.module';
 import { TeacherModule } from '@module/teacher/teacher.module';
 import { AdminModule } from '@module/admin/admin.module';
@@ -25,7 +24,6 @@ import { AdminModule } from '@module/admin/admin.module';
     AdminModule,
     AuthModule,
     QuizzsModule,
-    QuestionModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

@@ -48,6 +48,20 @@ export class StudentsService {
     return students
   }
 
+  async receive(studentId: string, quizId: string) {
+    const student = await this.StudentModel.findOne({ _id: studentId })
+    if (student.testsAssigned.includes(quizId)) {
+      await this.StudentModel.updateOne(
+        { _id: studentId }, { testsAssigned: student.testsAssigned.filter((quiz) => quiz != quizId) }
+      )
+    }
+    else {
+      await this.StudentModel.updateOne(
+        { _id: studentId }, { testsAssigned: [...student.testsAssigned, quizId] }
+      )
+    }
+  }
+
   async findSomeStudent(query: string, current: number, pageSize: number) {
     const { filter, sort } = aqp(query)
     // clear filter

@@ -1,7 +1,7 @@
 
-import { Questions } from '@/modules/question/schemas/question.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { Question } from '../dto/create-quizz.dto';
 
 export type QuizzDocument = HydratedDocument<Quizz>;
 
@@ -22,8 +22,8 @@ export class Quizz {
   @Prop()
   teacherId: string
 
-  @Prop([Questions])
-  questions: Questions[]
+  @Prop()
+  questions: Question[]
 }
 
 export const QuizzSchema = SchemaFactory.createForClass(Quizz);
