@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { CreateQuizzDto } from './dto/create-quizz.dto';
+import { CreateQuizzDto, Question } from './dto/create-quizz.dto';
 import { DataGetQuestionsDto, Score, UpdateQuestion, UpdateQuizzDto } from './dto/update-quizz.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -87,13 +87,26 @@ export class QuizzsService {
     })
     return res
   }
+
+  async findQuizNoAnswer(_id: string) {
+    const res = await this.QuizzModel.findOne({
+      _id
+    })
+    let q = res
+    q.questions.forEach((question: Question, index: number) => {
+      question.answers.forEach((answer: any) => {
+        answer.correctAnswer = false
+      })
+    })
+    return q
+  }
+
   async score(answers: Score) {
     const { result, _id } = answers
     const quiz = await this.QuizzModel.findOne({
       _id
     })
     let questions = quiz.questions
-    // console.log(questions)
     let correctAnswers = []
     questions.forEach((items: any, index: number) => {
       let answer = items.answers
@@ -108,7 +121,6 @@ export class QuizzsService {
     })
     let point = 0
     result.forEach((items: string, index: number) => {
-      // console.log(`${items} - ${correctAnswers[index]}`)
       if (items == correctAnswers[index]) {
         point = point + 1
       }

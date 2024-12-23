@@ -15,7 +15,7 @@ export class StudentsService {
   constructor(
     @InjectModel(Student.name) private StudentModel: Model<Student>,
     @InjectModel(User.name) private UserModel: Model<User>,
-    @InjectModel(User.name) private QuizzModel: Model<Quizz>
+    @InjectModel(Quizz.name) private QuizzModel: Model<Quizz>
   ) { }
 
   async create(createStudentDto: CreateStudentDto) {
@@ -50,14 +50,19 @@ export class StudentsService {
 
   async receive(studentId: string, quizId: string) {
     const student = await this.StudentModel.findOne({ _id: studentId })
-    if (student.testsAssigned.includes(quizId)) {
+    const quiz = await this.QuizzModel.findOne({ _id: quizId })
+    const quizAssign = { _id: quizId, image: quiz.image, description: quiz.description, name: quiz.name }
+
+    const exists = student.testsAssigned.filter((q) => q._id == quizId)
+
+    if (exists.length > 0) {
       await this.StudentModel.updateOne(
-        { _id: studentId }, { testsAssigned: student.testsAssigned.filter((quiz) => quiz != quizId) }
+        { _id: studentId }, { testsAssigned: student.testsAssigned.filter((quiz) => quiz._id != quizId) }
       )
     }
     else {
       await this.StudentModel.updateOne(
-        { _id: studentId }, { testsAssigned: [...student.testsAssigned, quizId] }
+        { _id: studentId }, { testsAssigned: [...student.testsAssigned, quizAssign] }
       )
     }
   }
@@ -96,8 +101,9 @@ export class StudentsService {
   }
 
 
-  async findOne(_id: string) {
-    const student = await this.StudentModel.findOne({ _id })
+  async findOne(_id: string) { 
+    const user = await this.UserModel.findOne({ _id })
+    const student=await this.StudentModel.findOne({email: user.email})
     return student
   }
 

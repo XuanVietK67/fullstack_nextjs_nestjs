@@ -40,6 +40,12 @@ export class QuizzsController {
   findOne(@Query('_id') _id: string,) {
     return this.quizzsService.findOne(_id);
   }
+
+  @Get('getOne/noCorrectAnswer')
+  findQuiz(@Query('_id') _id:string,) {
+    return this.quizzsService.findQuizNoAnswer(_id);
+  }
+  
   @Post('score')
   score(@Body() answers: Score) {
     return this.quizzsService.score(answers)

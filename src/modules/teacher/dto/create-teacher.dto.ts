@@ -8,14 +8,14 @@ export class CreateTeacherDto {
     password: string
 
     @IsNotEmpty()
-    name:string
+    name: string
 
     @IsOptional()
     image: string
 
     @IsOptional()
     phone: string
-    
+
     @IsOptional()
     address: string
 }

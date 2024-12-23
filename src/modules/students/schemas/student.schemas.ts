@@ -48,10 +48,10 @@ export class Student {
   address: string
 
   @Prop([Quizz])
-  testsDone: string[]
+  testsDone: QuizDone[]
 
   @Prop([])
-  testsAssigned: string[]
+  testsAssigned: QuizAssign[]
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);
